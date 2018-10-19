@@ -32,14 +32,15 @@ private:
     T* pData;
     Counter* reference;
 public:
+    
     SharedPtr() : pData(nullptr)
     {
         reference = new Counter;
-        reference->AddRef();
     }
+    
     SharedPtr(T* data)
     {
-        pData = data;
+        pData = new T(*data);
         reference = new Counter;
         reference->AddRef();
     }
@@ -60,19 +61,22 @@ public:
     {
         reference->AddRef();
     }
-    SharedPtr& operator=(const SharedPtr& a)
+    SharedPtr<T>& operator=(const SharedPtr& a)
     {
-        if (reference->Release() == 0)
+        if (this != &a)
         {
-            if (pData != nullptr)
+            if (reference->Release() == 0)
             {
-                delete pData;
+                if (pData != nullptr)
+                {
+                    delete pData;
+                }
+                delete reference;
             }
-            delete reference;
+            pData = a.pData;
+            reference = a.reference;
+            reference->AddRef();
         }
-        pData = a.pData;
-        reference = a.reference;
-        reference->AddRef();
         return *this;
     }
     
@@ -80,15 +84,18 @@ public:
     {
         if (reference->Release() == 0)
         {
-            delete pData;
+            if (pData != nullptr)
+            {
+                delete pData;
+                pData = nullptr;
+            }
             delete reference;
         }
         else
         {
             pData = nullptr;
         }
-        reference = new Counter;
-        reference->AddRef();
+        reference = nullptr;
         
     }
     void reset(T* b)
@@ -117,16 +124,24 @@ public:
     {
         if (pData == nullptr)
         {
-            throw std::invalid_argument("received null pointer");
+            throw std::invalid_argument("Received null pointer");
         }
         return pData;
     }
     T& operator*() const
     {
+        if (pData == nullptr)
+        {
+            throw std::invalid_argument("Received null pointer");
+        }
         return *pData;
     }
     T* operator->() const
     {
+        if (pData == nullptr)
+        {
+            throw std::invalid_argument("Received null pointer");
+        }
         return pData;
     }
     // возвращает количество объектов shared_ptr, которые ссылаются на тот же управляемый объект
