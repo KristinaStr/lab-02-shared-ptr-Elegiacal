@@ -7,7 +7,6 @@ class Counter
 {
 private:
     std::atomic_uint count;
-    
 public:
     void AddRef()
     {
