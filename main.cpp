@@ -12,6 +12,5 @@ int main(int argc, const char * argv[])
     int temp = 1001;
     SharedPtr<int> hello(&temp);
     SharedPtr<int> bye = hello;
-    std::cout << hello.use_count();
-    
+    std::cout << hello.use_count();   
 }
