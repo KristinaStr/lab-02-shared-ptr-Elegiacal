@@ -46,20 +46,15 @@ public:
     }
     ~SharedPtr()
     {
-        if (reference->Release() == 0)
-        {
-            if (pData != nullptr)
-            {
-                delete pData;
-                pData = nullptr;
-            }
-            delete reference;
-        }
-        reference = nullptr;
+        reset();
     }
+    
     SharedPtr(const SharedPtr& a) : pData(a.pData), reference(a.reference)
     {
-        reference->AddRef();
+        if (reference != nullptr)
+        {
+            reference->AddRef();
+        }
     }
     SharedPtr<T>& operator=(const SharedPtr& a)
     {
