@@ -7,6 +7,7 @@ class Counter
 {
 private:
     std::atomic_uint count;
+    
 public:
     void AddRef()
     {
@@ -81,35 +82,38 @@ public:
     
     void reset()
     {
-        if (reference->Release() == 0)
+        if (reference != nullptr)
+        {
+            reference->Release();
+        }
+        if (reference->getCount() == 0)
         {
             if (pData != nullptr)
             {
                 delete pData;
-                pData = nullptr;
             }
             delete reference;
         }
-        else
-        {
-            pData = nullptr;
-        }
         reference = nullptr;
-        
+        pData = nullptr;
     }
     void reset(T* b)
     {
-        if (reference->Release() == 0)
+        if (reference != nullptr)
+        {
+            reference->Release();
+        }
+        if (reference->getCount() == 0)
         {
             if (pData != nullptr)
             {
-                 delete pData;
+                delete pData;
             }
             delete reference;
         }
-        pData = b;
-        reference = new Counter;
+        reference = new Counter;;
         reference->AddRef();
+        pData = b;
     }
     void swap(SharedPtr& a)
     {
@@ -152,7 +156,6 @@ public:
     // проверяет, указывает ли указатель на объект
     operator bool() const
     {
-        return pData != nullptr ? true : false;
+        return pData != nullptr;
     }
 };
-
