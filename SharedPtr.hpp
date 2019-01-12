@@ -9,14 +9,17 @@ private:
     std::atomic_uint count;
     
 public:
-    void AddRef()
+    ~Counter() = default;
+    Counter& AddRef()
     {
         count++;
+        return *this;
     }
     
-    int Release()
+    Counter& Release()
     {
-        return --count;
+        count--;
+        return *this;
     }
     size_t getCount()
     {
@@ -58,20 +61,7 @@ public:
     }
     SharedPtr<T>& operator=(const SharedPtr& a)
     {
-        if (this != &a)
-        {
-            if (reference->Release() == 0)
-            {
-                if (pData != nullptr)
-                {
-                    delete pData;
-                }
-                delete reference;
-            }
-            pData = a.pData;
-            reference = a.reference;
-            reference->AddRef();
-        }
+        SharedPtr(a).swap(*this);
         return *this;
     }
     
