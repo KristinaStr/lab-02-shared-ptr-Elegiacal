@@ -7,7 +7,7 @@
 //
 #include "SharedPtr.hpp"
 
-int main(int argc, const char * argv[])
+int main()
 {
     SharedPtr<double> temp1;
     SharedPtr<double> temp2(temp1);
