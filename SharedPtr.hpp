@@ -32,18 +32,18 @@ template <typename T>
 class SharedPtr
 {
 private:
-    T* pData;
+    T* pData = nullptr;
     Counter* reference;
 public:
     
     SharedPtr() : pData(nullptr)
     {
         reference = new Counter;
+        reference->AddRef();
     }
     
-    SharedPtr(T* data)
+    SharedPtr(T* data) : pData(data)
     {
-        pData = new T(*data);
         reference = new Counter;
         reference->AddRef();
     }
@@ -52,7 +52,12 @@ public:
         reset();
     }
     
-    SharedPtr(const SharedPtr& a) : pData(a.pData), reference(a.reference)
+    SharedPtr(SharedPtr&& a)
+    {
+        this->swap(a);
+    }
+    
+    SharedPtr(const SharedPtr<T>& a) : pData(a.pData), reference(a.reference)
     {
         if (reference != nullptr)
         {
