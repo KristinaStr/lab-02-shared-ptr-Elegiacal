@@ -9,6 +9,8 @@ private:
     std::atomic_uint count;
     
 public:
+    Counter () : count(1)
+    {}
     ~Counter() = default;
     Counter& AddRef()
     {
@@ -39,13 +41,11 @@ public:
     SharedPtr() : pData(nullptr)
     {
         reference = new Counter;
-        reference->AddRef();
     }
     
     SharedPtr(T* data) : pData(data)
     {
         reference = new Counter;
-        reference->AddRef();
     }
     ~SharedPtr()
     {
@@ -69,6 +69,11 @@ public:
         SharedPtr(a).swap(*this);
         return *this;
     }
+    SharedPtr<T> &operator=(SharedPtr&& a)
+    {
+        this->swap(std::move(a));
+        return *this;
+    }
     
     void reset()
     {
@@ -87,24 +92,12 @@ public:
         reference = nullptr;
         pData = nullptr;
     }
+    
     void reset(T* b)
     {
-        if (reference != nullptr)
-        {
-            reference->Release();
-        }
-        if (reference->getCount() == 0)
-        {
-            if (pData != nullptr)
-            {
-                delete pData;
-            }
-            delete reference;
-        }
-        reference = new Counter;;
-        reference->AddRef();
-        pData = b;
+        SharedPtr<T>(b).swap(*this);
     }
+    
     void swap(SharedPtr& a)
     {
         if (pData != a.pData)
